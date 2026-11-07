@@ -48,7 +48,10 @@ export default function Footer() {
             Avec tout notre amour,
           </p>
           <div style={{
-            fontFamily: '"Great Vibes", cursive', fontSize: 'clamp(2.2rem,7vw,3.8rem)',
+            fontFamily: '"Great Vibes", cursive',
+            fontSize: 'min(7vw, 3.8rem)',
+            whiteSpace: 'nowrap',
+            textAlign: 'center',
             background: 'linear-gradient(135deg, #a07c3a, #C6A15B, #E8D5A0, #C6A15B, #a07c3a)',
             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
             backgroundSize: '200% auto', animation: 'goldShimmer 4s linear infinite', lineHeight: 1.2,

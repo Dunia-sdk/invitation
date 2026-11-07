@@ -69,11 +69,18 @@ export default function WeddingInvitation() {
 
         {/* Couple names */}
         <motion.div variants={fadeUp(0.3)} initial="hidden" whileInView="visible" viewport={{ once: true }}
-          style={{ marginBottom: 'clamp(12px,2vw,20px)' }}>
+          style={{ marginBottom: 'clamp(12px,2vw,20px)', width: '100%', overflow: 'hidden' }}>
           <h1 style={{
             fontFamily:'"Great Vibes", cursive',
-            fontSize:'clamp(3rem, 12vw, 6.5rem)',
-            lineHeight: 1.1,
+            /* Scale purely with viewport so it always stays on one line */
+            fontSize: 'min(8.5vw, 6.5rem)',
+            lineHeight: 1.15,
+            whiteSpace: 'nowrap',
+            display: 'block',
+            width: '100%',
+            textAlign: 'center',
+            /* Shrink text if still too wide (last resort) */
+            overflowX: 'hidden',
             background:'linear-gradient(135deg, #a07c3a 0%, #C6A15B 25%, #E8D5A0 45%, #C6A15B 55%, #a07c3a 75%, #C6A15B 100%)',
             WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text',
             backgroundSize:'200% auto', animation:'goldShimmer 4s linear infinite',
