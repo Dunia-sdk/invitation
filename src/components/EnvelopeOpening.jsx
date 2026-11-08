@@ -1,393 +1,200 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useEffect, useRef, useState } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
+import { useLanguage } from '../context/LanguageContext'
+import { useMusic } from '../context/MusicContext'
+import { EASE } from '../lib/motion'
+import { Star8 } from './ui/Ornaments'
+import { makeDust } from '../lib/dust'
 
-// ─── Floral vine SVG ─────────────────────────────────────────────────────────
-function FloralVine() {
-  const flowers = [40, 90, 140, 190, 240, 290, 340, 390]
-  return (
-    <svg viewBox="0 0 60 440" fill="none" style={{ width: '100%', height: '100%' }}>
-      {/* Main stem */}
-      <path
-        d="M30 5 C28 55 32 105 30 155 C28 205 32 255 30 305 C28 355 32 405 30 440"
-        stroke="rgba(190,170,140,0.3)" strokeWidth="1" fill="none" strokeLinecap="round"
-      />
-      {flowers.map((y, i) => (
-        <g key={i} transform={`translate(30, ${y})`}>
-          {/* Centre circle */}
-          <circle cx="0" cy="0" r="4" fill="rgba(190,170,140,0.18)" stroke="rgba(190,170,140,0.25)" strokeWidth="0.6"/>
-          {/* 5 petals */}
-          {[0, 72, 144, 216, 288].map((angle, j) => {
-            const rad = (angle * Math.PI) / 180
-            const px = 7 * Math.cos(rad), py = 7 * Math.sin(rad)
-            return <ellipse key={j} cx={px} cy={py} rx="3" ry="2"
-              transform={`rotate(${angle}, ${px}, ${py})`}
-              fill="rgba(190,170,140,0.15)" stroke="rgba(190,170,140,0.2)" strokeWidth="0.4"/>
-          })}
-          {/* Two leaf branches */}
-          <path d={`M0 0 C-10 -6 -16 -2 -14 6`} stroke="rgba(190,170,140,0.22)" strokeWidth="0.7" fill="none"/>
-          <ellipse cx="-10" cy="-1" rx="5" ry="2" transform="rotate(-25,-10,-1)" fill="rgba(190,170,140,0.14)"/>
-          <path d={`M0 0 C10 -6 16 -2 14 6`} stroke="rgba(190,170,140,0.22)" strokeWidth="0.7" fill="none"/>
-          <ellipse cx="10" cy="-1" rx="5" ry="2" transform="rotate(25,10,-1)" fill="rgba(190,170,140,0.14)"/>
-        </g>
-      ))}
-    </svg>
-  )
-}
+const DUST = makeDust(14, 5)
 
-// ─── Realistic wax seal ───────────────────────────────────────────────────────
-function WaxSeal({ size, breaking, onClick }) {
+// ─── Wax seal ────────────────────────────────────────────────────────────────
+function WaxSeal({ initials, breaking }) {
   return (
     <motion.div
-      onClick={onClick}
-      style={{ width: size, height: size, cursor: 'pointer', position: 'relative', flexShrink: 0 }}
-      whileHover={{ scale: 1.05 }}
-      animate={breaking
-        ? { scale: [1, 1.1, 0.8, 0], rotate: [0, -6, 10, 20], opacity: [1, 0.9, 0.5, 0] }
-        : {}}
-      transition={breaking ? { duration: 0.65, ease: 'easeIn' } : {}}
+      className="env__seal-art"
+      animate={breaking ? { scale: [1, 1.1, 0.8, 0], rotate: [0, -6, 10, 20], opacity: [1, 0.9, 0.5, 0] } : undefined}
+      transition={{ duration: 0.65, ease: 'easeIn' }}
     >
-      <svg width={size} height={size} viewBox="0 0 130 130">
+      <svg viewBox="0 0 130 130" aria-hidden="true">
         <defs>
-          <radialGradient id="waxG" cx="35%" cy="30%" r="65%">
-            <stop offset="0%" stopColor="#8B2035"/>
-            <stop offset="40%" stopColor="#6B1525"/>
-            <stop offset="75%" stopColor="#4A0F1A"/>
-            <stop offset="100%" stopColor="#300A10"/>
+          <radialGradient id="wax-g" cx=".35" cy=".3" r=".65">
+            <stop offset="0" stopColor="#a3213f" /><stop offset=".4" stopColor="#7a1530" /><stop offset=".75" stopColor="#560e22" /><stop offset="1" stopColor="#35091a" />
           </radialGradient>
-          <radialGradient id="waxShine" cx="28%" cy="22%" r="45%">
-            <stop offset="0%" stopColor="rgba(210,110,120,0.4)"/>
-            <stop offset="100%" stopColor="rgba(210,110,120,0)"/>
+          <radialGradient id="wax-shine" cx=".28" cy=".22" r=".45">
+            <stop offset="0" stopColor="rgba(235,140,150,.45)" /><stop offset="1" stopColor="rgba(235,140,150,0)" />
           </radialGradient>
-          <linearGradient id="goldText" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#8a6520"/>
-            <stop offset="30%" stopColor="#C6A15B"/>
-            <stop offset="55%" stopColor="#ebdcb4ff"/>
-            <stop offset="80%" stopColor="#b4a764ff"/>
-            <stop offset="100%" stopColor="#8a6520"/>
+          <linearGradient id="wax-gold" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#a17b42" /><stop offset=".35" stopColor="#d9bd7e" /><stop offset=".6" stopColor="#f3e8c9" /><stop offset="1" stopColor="#a17b42" />
           </linearGradient>
-          <filter id="sealShadow">
-            <feDropShadow dx="0" dy="5" stdDeviation="8" floodColor="#200510" floodOpacity="0.5"/>
-          </filter>
+          <filter id="wax-shadow" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="6" stdDeviation="7" floodColor="#1a0309" floodOpacity=".55" /></filter>
         </defs>
-        {/* Irregular wax blob */}
         <path
-          d="M65 5 C77 4,89 8,98 15 C108 22,116 33,122 45 C128 57,129 70,126 82 C123 94,116 105,106 113 C96 121,83 126,70 127 C57 128,44 125,34 118 C24 111,16 100,11 87 C6 74,5 60,9 47 C13 34,22 23,34 15 C44 7,53 6,65 5Z"
-          fill="url(#waxG)" filter="url(#sealShadow)"
+          d="M65 5C77 4 89 8 98 15c10 7 18 18 24 30 6 12 7 25 4 37-3 12-10 23-20 31-10 8-23 13-36 14-13 1-26-2-36-9-10-7-18-18-23-31-5-13-6-27-2-40 4-13 13-24 25-32 10-8 19-9 31-10Z"
+          fill="url(#wax-g)" filter="url(#wax-shadow)"
         />
-        <path
-          d="M65 5 C77 4,89 8,98 15 C108 22,116 33,122 45 C128 57,129 70,126 82 C123 94,116 105,106 113 C96 121,83 126,70 127 C57 128,44 125,34 118 C24 111,16 100,11 87 C6 74,5 60,9 47 C13 34,22 23,34 15 C44 7,53 6,65 5Z"
-          fill="url(#waxShine)"
-        />
-        {/* Rim ring */}
-        <circle cx="65" cy="65" r="43" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1.5"/>
-        {/* Dot pattern on rim */}
-        {Array.from({ length: 20 }).map((_, i) => {
-          const a = (i * 18 * Math.PI) / 180
-          return <circle key={i} cx={65 + 42 * Math.cos(a)} cy={65 + 42 * Math.sin(a)}
-            r="1.3" fill="rgba(255,255,255,0.1)"/>
+        <path d="M65 5C77 4 89 8 98 15c10 7 18 18 24 30 6 12 7 25 4 37-3 12-10 23-20 31-10 8-23 13-36 14-13 1-26-2-36-9-10-7-18-18-23-31-5-13-6-27-2-40 4-13 13-24 25-32 10-8 19-9 31-10Z" fill="url(#wax-shine)" />
+        <circle cx="65" cy="65" r="43" fill="none" stroke="rgba(255,255,255,.1)" strokeWidth="1.4" />
+        <circle cx="65" cy="65" r="38" fill="none" stroke="rgba(0,0,0,.18)" strokeWidth="1" />
+        {Array.from({ length: 24 }).map((_, i) => {
+          const a = (i * 15 * Math.PI) / 180
+          return <circle key={i} cx={65 + 41 * Math.cos(a)} cy={65 + 41 * Math.sin(a)} r="1.2" fill="rgba(255,255,255,.12)" />
         })}
-  {/* K & A - Luxury Calligraphy */}
-<text
-  x="65"
-  y="77"
-  textAnchor="middle"
-  fontFamily='"Great Vibes", cursive'
-  fontSize="39"
-  fontWeight="450"
-  fontStyle="italic"
-  letterSpacing="1"
-  fill="url(#goldText)"
-  style={{
-    filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.6))',
-  }}
->
-  K &amp; A
-</text>
+        <text x="65" y="78" textAnchor="middle" fontFamily="var(--font-script)" fontSize="38" fill="url(#wax-gold)" style={{ filter: 'drop-shadow(0 2px 2px rgba(0,0,0,.55))' }}>
+          {initials}
+        </text>
       </svg>
-
-      {/* Crack lines on break */}
       {breaking && (
-        <motion.svg width={size} height={size} viewBox="0 0 130 130"
-          style={{ position: 'absolute', top: 0, left: 0 }}
-          initial={{ opacity: 0 }} animate={{ opacity: [0, 1, 0] }} transition={{ duration: 0.65 }}>
-          <path d="M65 65 L42 28 M65 65 L92 22 M65 65 L112 58 M65 65 L78 102 M65 65 L38 95"
-            stroke="rgba(248,242,232,0.7)" strokeWidth="1.2" strokeLinecap="round"/>
+        <motion.svg viewBox="0 0 130 130" className="env__crack" initial={{ opacity: 0 }} animate={{ opacity: [0, 1, 0] }} transition={{ duration: 0.65 }} aria-hidden="true">
+          <path d="M65 65 42 28M65 65 92 22M65 65 112 58M65 65 78 102M65 65 38 95" stroke="rgba(248,243,233,.75)" strokeWidth="1.2" strokeLinecap="round" />
         </motion.svg>
       )}
     </motion.div>
   )
 }
 
-// ─── Main EnvelopeOpening component ─────────────────────────────────────────
+// ─── Envelope ────────────────────────────────────────────────────────────────
 export default function EnvelopeOpening({ onOpen }) {
-  const [phase, setPhase] = useState('idle')
-  // idle → breaking → opening → sliding → zooming → (onOpen called)
-  const [sealSize, setSealSize] = useState(120)
+  const { lang, setLang, t } = useLanguage()
+  const music = useMusic()
+  const reduce = useReducedMotion()
+  const [phase, setPhase] = useState('idle') // idle → breaking → opening → card → (onOpen)
+  const [flapBehind, setFlapBehind] = useState(false)
+  const timers = useRef([])
 
+  // Lock page scroll while the invitation is sealed.
   useEffect(() => {
-    const updateSize = () => {
-      setSealSize(Math.min(130, Math.max(80, window.innerWidth * 0.26)))
-    }
-    updateSize()
-    window.addEventListener('resize', updateSize)
-    return () => window.removeEventListener('resize', updateSize)
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = prev }
   }, [])
+  useEffect(() => () => timers.current.forEach(clearTimeout), [])
 
-  const handleOpen = () => {
+  const later = (fn, ms) => timers.current.push(setTimeout(fn, ms))
+
+  const open = () => {
     if (phase !== 'idle') return
+    music?.play() // a real user gesture → the soundtrack is allowed to start
+    if (reduce) { setPhase('card'); later(onOpen, 500); return }
     setPhase('breaking')
-    setTimeout(() => setPhase('opening'), 650)
-    setTimeout(() => setPhase('sliding'), 1500)
-    setTimeout(() => setPhase('zooming'), 2500)
-    setTimeout(() => onOpen(), 3200)
+    later(() => setPhase('opening'), 650)
+    later(() => setFlapBehind(true), 650 + 480) // after the flap passes edge-on, drop it behind the card
+    later(() => setPhase('card'), 1650)
+    later(onOpen, 3350)
   }
 
-  const isFlapped = phase === 'opening' || phase === 'sliding' || phase === 'zooming'
-  const showCard  = phase === 'sliding' || phase === 'zooming'
-  const showSeal  = phase === 'idle' || phase === 'breaking'
+  const isOpen = phase === 'opening' || phase === 'card'
+  const initials = `${t.brideName.charAt(0)} ${lang === 'ar' ? '·' : '&'} ${t.groomName.charAt(0)}`
 
   return (
     <motion.div
-      style={{
-        position: 'fixed', inset: 0, zIndex: 9999,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: 'linear-gradient(145deg, #6a1d33 0%, #45101F 50%, #5a1828 100%)',
-        overflow: 'hidden',
-      }}
-      animate={phase === 'zooming' ? { scale: 2.2, opacity: 0 } : { scale: 1, opacity: 1 }}
-      transition={phase === 'zooming' ? { duration: 0.75, ease: [0.4, 0, 1, 1] } : { duration: 0 }}
+      className="env"
+      role="dialog"
+      aria-modal="true"
+      aria-label={t.cordiallyInvited}
+      initial={{ opacity: 1 }}
+      exit={{ opacity: 0, scale: 1.14, transition: { duration: reduce ? 0.3 : 1.15, ease: [0.65, 0, 0.35, 1] } }}
     >
-      {/* Background zellige */}
-      <svg style={{ position:'absolute', inset:0, width:'100%', height:'100%', opacity:0.07, pointerEvents:'none' }}>
-        <defs>
-          <pattern id="bg-z" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
-            <path d="M40 0 L80 40 L40 80 L0 40 Z" fill="none" stroke="#E8D5A0" strokeWidth="0.5"/>
-            <path d="M40 16 L64 40 L40 64 L16 40 Z" fill="none" stroke="#E8D5A0" strokeWidth="0.3"/>
-            <circle cx="40" cy="40" r="5" fill="none" stroke="#E8D5A0" strokeWidth="0.2"/>
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#bg-z)"/>
-      </svg>
+      <div className="env__bg zellige" aria-hidden="true" />
+      <div className="env__vignette" aria-hidden="true" />
+      <div className="dust-field" aria-hidden="true">
+        {DUST.map((d, i) => (<i key={i} style={{ '--x': `${d.x}%`, '--s': `${d.size}px`, '--d': `${d.dur}s`, '--w': `${d.delay}s` }} />))}
+      </div>
 
-      {/* Floating gold particles */}
-      {Array.from({ length: 16 }).map((_, i) => (
-        <motion.div key={i}
-          style={{
-            position: 'absolute', borderRadius: '50%', background: '#C6A15B',
-            width: 1 + (i % 3), height: 1 + (i % 3),
-            left: `${5 + (i * 6.1) % 90}%`,
-            top: `${5 + (i * 7.3) % 85}%`,
-            opacity: 0.2,
-          }}
-          animate={{ y: [0, -20, 0], opacity: [0.1, 0.4, 0.1] }}
-          transition={{ duration: 3 + (i % 3), repeat: Infinity, delay: i * 0.3 }}
-        />
-      ))}
+      <div className="env__lang" role="group" aria-label="Language / اللغة">
+        <button type="button" aria-pressed={lang === 'fr'} onClick={() => setLang('fr')}>FR</button>
+        <span aria-hidden="true" />
+        <button type="button" lang="ar" aria-pressed={lang === 'ar'} onClick={() => setLang('ar')}>العربية</button>
+      </div>
 
-      {/* ─── Main layout ─── */}
-      <div style={{
-        display: 'flex', flexDirection: 'column', alignItems: 'center',
-        gap: 'clamp(16px, 3.5vh, 36px)',
-        padding: 'clamp(16px, 4vw, 32px)',
-        width: '100%', maxWidth: 480,
-      }}>
-
-        {/* Top gold line */}
-        <motion.div
-          initial={{ scaleX: 0, opacity: 0 }}
-          animate={{ scaleX: 1, opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.9 }}
-          style={{ height: 1, width: 'min(180px, 55%)', background: 'linear-gradient(90deg, transparent, rgba(198,161,91,0.6), transparent)' }}
-        />
-
-        {/* Cordialement */}
+      <div className="env__inner">
         <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.7 }}
-          style={{
-            fontFamily: 'Lato, sans-serif', letterSpacing: '0.4em', textTransform: 'uppercase',
-            fontSize: 'clamp(0.55rem, 1.8vw, 0.72rem)', color: 'rgba(198,161,91,0.75)',
-          }}
+          className="eyebrow env__kicker"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: phase === 'card' ? 0 : 1, y: 0 }}
+          transition={{ duration: 0.9, delay: phase === 'idle' ? 0.5 : 0 }}
         >
-          Vous êtes cordialement invités
+          {t.cordiallyInvited}
         </motion.p>
 
-        {/* ─── Ivory Envelope ─── */}
         <motion.div
-          initial={{ opacity: 0, y: 50, scale: 0.9 }}
+          className="env__shadow"
+          initial={{ opacity: 0, y: 46, scale: 0.94 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ delay: 0.8, duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          style={{
-            position: 'relative',
-            width: 'min(300px, 82vw)',
-            aspectRatio: '9/14',
-            filter: 'drop-shadow(0 25px 60px rgba(0,0,0,0.45))',
-          }}
+          transition={{ duration: 1.3, delay: 0.7, ease: EASE }}
         >
-          {/* Envelope body */}
-          <div style={{
-            position: 'absolute', inset: 0, borderRadius: 6,
-            background: 'linear-gradient(150deg, #F5EFE4 0%, #EEE5D4 45%, #F2EAD8 70%, #EAE0CC 100%)',
-            overflow: 'hidden',
-          }}>
-            {/* ── Bottom flap ── */}
-            <div style={{
-              position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%',
-              clipPath: 'polygon(0% 100%, 50% 0%, 100% 100%)',
-              background: 'linear-gradient(to top, #E8DEC8, #EDE5D2)',
-            }}/>
-            {/* ── Left flap ── */}
-            <div style={{
-              position: 'absolute', top: 0, left: 0, bottom: 0, width: '50%',
-              clipPath: 'polygon(0% 0%, 100% 50%, 0% 100%)',
-              background: 'linear-gradient(to right, #E8DEC8, #EDE5D2)',
-            }}/>
-            {/* ── Right flap ── */}
-            <div style={{
-              position: 'absolute', top: 0, right: 0, bottom: 0, width: '50%',
-              clipPath: 'polygon(100% 0%, 0% 50%, 100% 100%)',
-              background: 'linear-gradient(to left, #E8DEC8, #EDE5D2)',
-            }}/>
+          <div className={`env__envelope ${flapBehind ? 'is-behind' : ''}`}>
+            <div className="env__back" />
 
-            {/* ── Top flap (opens upward) ── */}
+            {/* Invitation card that slides out */}
             <motion.div
-              style={{
-                position: 'absolute', top: 0, left: 0, right: 0, height: '50%',
-                clipPath: 'polygon(0% 0%, 50% 100%, 100% 0%)',
-                background: 'linear-gradient(to bottom, #E8DEC8, #E8DEC8)',
-                transformOrigin: 'top center',
-                zIndex: 10,
-              }}
-              animate={isFlapped
-                ? { rotateX: -185, transition: { duration: 0.9, ease: [0.4, 0, 0.2, 1] } }
-                : { rotateX: 0 }
-              }
+              className="env__card"
+              initial={false}
+              animate={{ y: phase === 'card' ? '-72%' : '4%' }}
+              transition={{ duration: reduce ? 0.4 : 1.5, ease: EASE }}
             >
-              {/* Inner shadow on flap */}
-              <div style={{
-                position: 'absolute', inset: 0,
-                clipPath: 'polygon(0% 0%, 50% 100%, 100% 0%)',
-                background: 'linear-gradient(to bottom, rgba(0,0,0,0.03), rgba(0,0,0,0.1))',
-              }}/>
+              <div className="env__card-frame">
+                <Star8 size={22} />
+                <span className="env__card-name foil">{t.brideName}</span>
+                <span className="env__card-amp">&amp;</span>
+                <span className="env__card-name foil">{t.groomName}</span>
+                <span className="env__card-date">{t.weddingDate}</span>
+              </div>
             </motion.div>
 
-            {/* ── Floral vines ── */}
-            <div style={{ position: 'absolute', left: '3%', top: '4%', bottom: '4%', width: '14%', pointerEvents:'none' }}>
-              <FloralVine />
-            </div>
-            <div style={{ position: 'absolute', right: '3%', top: '4%', bottom: '4%', width: '14%', transform: 'scaleX(-1)', pointerEvents:'none' }}>
-              <FloralVine />
-            </div>
+            {/* Pocket (front of the envelope) */}
+            <svg className="env__front" viewBox="0 0 700 500" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="pk-l" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor="#e9dcc3" /><stop offset="1" stopColor="#f1e7d2" /></linearGradient>
+                <linearGradient id="pk-r" x1="1" y1="0" x2="0" y2="0"><stop offset="0" stopColor="#e9dcc3" /><stop offset="1" stopColor="#f1e7d2" /></linearGradient>
+                <linearGradient id="pk-b" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stopColor="#f6eedc" /><stop offset="1" stopColor="#ecdfc6" /></linearGradient>
+              </defs>
+              <path d="M0 0 350 262 0 500Z" fill="url(#pk-l)" />
+              <path d="M700 0 350 262 700 500Z" fill="url(#pk-r)" />
+              <path d="M0 500 350 262 700 500Z" fill="url(#pk-b)" />
+              <path d="M0 0 350 262 700 0" fill="none" stroke="#C6A15B" strokeOpacity=".75" strokeWidth="1.2" vectorEffect="non-scaling-stroke" />
+              <path d="M0 500 350 262 700 500" fill="none" stroke="rgba(120,85,40,.28)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+            </svg>
 
-            {/* Subtle fold-line shadows */}
-            <div style={{ position:'absolute', inset:0, pointerEvents:'none',
-              background: 'linear-gradient(to bottom right, rgba(0,0,0,0.03) 0%, transparent 50%), linear-gradient(to bottom left, rgba(0,0,0,0.03) 0%, transparent 50%)',
-            }}/>
+            {/* Flap — burgundy-lined, flips up and back */}
+            <motion.div
+              className="env__flap"
+              initial={false}
+              animate={{ rotateX: isOpen ? 180 : 0 }}
+              transition={{ duration: reduce ? 0.01 : 0.95, ease: [0.4, 0, 0.2, 1] }}
+            >
+              <svg className="env__flap-face env__flap-face--out" viewBox="0 0 700 262" preserveAspectRatio="none" aria-hidden="true">
+                <defs><linearGradient id="fl-o" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#f6eedc" /><stop offset="1" stopColor="#e8dcc2" /></linearGradient></defs>
+                <path d="M0 0H700L350 262Z" fill="url(#fl-o)" />
+                <path d="M0 0 350 262 700 0" fill="none" stroke="#C6A15B" strokeOpacity=".85" strokeWidth="1.4" vectorEffect="non-scaling-stroke" />
+              </svg>
+              <svg className="env__flap-face env__flap-face--in" viewBox="0 0 700 262" preserveAspectRatio="none" aria-hidden="true">
+                <defs><linearGradient id="fl-i" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#4a1024" /><stop offset="1" stopColor="#800020" /></linearGradient></defs>
+                <path d="M0 0H700L350 262Z" fill="url(#fl-i)" />
+                <path d="M0 0 350 262 700 0" fill="none" stroke="#C6A15B" strokeOpacity=".7" strokeWidth="1.2" vectorEffect="non-scaling-stroke" />
+              </svg>
+            </motion.div>
 
-            {/* ── Card sliding out ── */}
-            <AnimatePresence>
-              {showCard && (
-                <motion.div
-                  initial={{ y: '110%', opacity: 0 }}
-                  animate={{ y: '-6%', opacity: 1 }}
-                  transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1], delay: 0.5 }}
-                  style={{
-                    position: 'absolute', inset: '3% 5%', zIndex: 15,
-                    background: 'linear-gradient(145deg, #FBF7F0, #F8F2E8)',
-                    borderRadius: 3,
-                    boxShadow: '0 -4px 24px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.08)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}
-                >
-                  <div style={{ textAlign:'center', padding: '12px' }}>
-                    <div style={{ fontFamily:'"Great Vibes", cursive', fontSize:'clamp(1.2rem,4vw,1.8rem)',
-                      background:'linear-gradient(135deg, #a07c3a, #C6A15B, #E8D5A0, #C6A15B, #a07c3a)',
-                      WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text',
-                    }}>Kaoutar &amp; Abdelsamad</div>
-                    <div style={{ marginTop:8, fontFamily:'"Cormorant Garamond", serif', fontSize:'clamp(0.65rem,1.8vw,0.8rem)',
-                      color:'rgba(100,27,48,0.6)', letterSpacing:'0.2em', textTransform:'uppercase' }}>
-                      26 · 01 · 2027
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* ── Wax Seal ── */}
-            <AnimatePresence>
-              {showSeal && (
-                <motion.div
-                  exit={{ scale: 0, opacity: 0, transition: { duration: 0.25 } }}
-                  style={{
-                    position: 'absolute', top: '50%', left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    zIndex: 20,
-                  }}
-                >
-                  <WaxSeal
-                    size={sealSize}
-                    breaking={phase === 'breaking'}
-                    onClick={handleOpen}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {phase === 'idle' || phase === 'breaking' ? (
+              <div className="env__seal" onClick={open} aria-hidden="true">
+                <WaxSeal initials={initials} breaking={phase === 'breaking'} />
+              </div>
+            ) : null}
           </div>
         </motion.div>
 
-        {/* ─── CTA Button ─── */}
-        <AnimatePresence>
-          {phase === 'idle' && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ delay: 1.4, duration: 0.6 }}
-              style={{ display:'flex', flexDirection:'column', alignItems:'center', gap: 14 }}
-            >
-              {/* Bounce arrow */}
-              <motion.div
-                animate={{ y: [0, 7, 0] }}
-                transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
-              >
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                  <path d="M9 2 L9 16 M4 11 L9 16 L14 11"
-                    stroke="rgba(198,161,91,0.55)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </motion.div>
-
-              <motion.button
-                onClick={handleOpen}
-                style={{
-                  padding: 'clamp(10px,2.5vw,14px) clamp(28px,6vw,48px)',
-                  fontFamily: '"Cormorant Garamond", serif',
-                  fontSize: 'clamp(0.75rem, 2.5vw, 0.9rem)',
-                  letterSpacing: '0.18em', textTransform: 'uppercase',
-                  color: '#3A100E', border: 'none', borderRadius: 2, cursor: 'pointer',
-                  background: 'linear-gradient(135deg, #a07c3a 0%, #C6A15B 25%, #E8D5A0 50%, #C6A15B 75%, #a07c3a 100%)',
-                  backgroundSize: '200% auto',
-                  boxShadow: '0 4px 20px rgba(198,161,91,0.3)',
-                }}
-                whileHover={{ scale: 1.03, boxShadow: '0 6px 28px rgba(198,161,91,0.5)' }}
-                whileTap={{ scale: 0.97 }}
-              >
-                ✦ &nbsp;Ouvrir votre invitation&nbsp; ✦
-              </motion.button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Date */}
-        <motion.p
-          initial={{ opacity: 0 }} animate={{ opacity: 0.45 }} transition={{ delay: 1.8 }}
-          style={{
-            fontFamily: '"Cormorant Garamond", serif', letterSpacing: '0.3em',
-            fontSize: 'clamp(0.75rem, 2vw, 0.9rem)', color: '#C6A15B',
-          }}
+        <motion.div
+          className="env__cta"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: phase === 'idle' ? 1 : 0, y: 0 }}
+          transition={{ duration: 0.8, delay: phase === 'idle' ? 1.6 : 0 }}
+          style={{ pointerEvents: phase === 'idle' ? 'auto' : 'none' }}
         >
-          26 · 01 · 2027
-        </motion.p>
+          <button type="button" className="btn" onClick={open} disabled={phase !== 'idle'}>
+            <Star8 size={14} /> {t.openInvitation} <Star8 size={14} />
+          </button>
+          <p className="env__date">{t.weddingDate}</p>
+        </motion.div>
       </div>
     </motion.div>
   )

@@ -1,25 +1,28 @@
-import React, { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { translations } from '../i18n'
 
-const LanguageContext = createContext({ lang: 'fr', setLang: () => {} })
+const LanguageContext = createContext({ lang: 'fr', setLang: () => {}, t: translations.fr })
 
 export function LanguageProvider({ children }) {
   const [lang, setLang] = useState('fr')
 
-  // Apply dir attribute to <html> for RTL support
+  // Keep <html lang/dir> and the tab title in sync — dir drives every logical CSS property.
   useEffect(() => {
-    document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr')
-    document.documentElement.setAttribute('lang', lang)
+    const root = document.documentElement
+    root.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr')
+    root.setAttribute('lang', lang)
+    document.title = translations[lang].pageTitle
   }, [lang])
 
-  return (
-    <LanguageContext.Provider value={{ lang, setLang }}>
-      {children}
-    </LanguageContext.Provider>
-  )
+  const value = useMemo(() => ({ lang, setLang, t: translations[lang] }), [lang])
+  return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>
 }
 
-// Hook for components
 export function useLanguage() {
   return useContext(LanguageContext)
 }
 
+/** Shortcut: the translation table of the active language. */
+export function useT() {
+  return useContext(LanguageContext).t
+}

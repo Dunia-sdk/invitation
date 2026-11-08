@@ -7,7 +7,9 @@ export const CONFIG = {
   // Couple info
   bride: 'Kaoutar',
   groom: 'Abdsamad',
-  weddingDate: new Date('2027-01-26T20:00:00'),
+  // Explicit +01:00 (Morocco, outside Ramadan) so the countdown targets the same
+  // instant for every guest, wherever their device clock is set.
+  weddingDate: new Date('2027-01-26T20:00:00+01:00'),
 
   // Venue
   venueName: 'Salle de fête Ryan',

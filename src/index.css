@@ -1,134 +1,259 @@
 @import "tailwindcss";
 
-/* ── Tailwind v4 custom theme ───────────────────────────────────────────── */
-@theme {
-  --color-burgundy: #641B30;
-  --color-burgundy-dark: #45101F;
-  --color-burgundy-light: #7a2340;
-  --color-gold: #C6A15B;
-  --color-gold-light: #E8D5A0;
-  --color-gold-dark: #a07c3a;
-  --color-ivory: #F8F2E8;
-  --color-wine: #45101F;
+/* Component stylesheets (colocated by feature, imported once here) */
+@import "./styles/envelope.css";
+@import "./styles/hero.css";
+@import "./styles/sections.css";
+@import "./styles/rsvp.css";
+@import "./styles/controls.css";
 
-  --font-family-serif: "Cormorant Garamond", Georgia, serif;
-  --font-family-script: "Great Vibes", cursive;
-  --font-family-display: "Playfair Display", serif;
-  --font-family-body: Lato, sans-serif;
-}
-
-/* ── Root CSS variables ─────────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════════════════
+   DESIGN TOKENS — "Royal Burgundy & Champagne"
+   One palette, used everywhere. Gold is a restrained accent, never a fill.
+   ══════════════════════════════════════════════════════════════════════════ */
 :root {
-  --burgundy: #641B30;
-  --wine: #45101F;
-  --gold: #C6A15B;
-  --gold-light: #E8D5A0;
-  --gold-dark: #a07c3a;
-  --ivory: #F8F2E8;
+  /* Burgundy family */
+  --burgundy: #800020;
+  --burgundy-soft: #6a1228;
+  --wine: #4A1024;
+  --wine-deep: #35091a;
+  --wine-night: #260612;
+
+  /* Gold family */
+  --champagne: #C6A15B;
+  --champagne-light: #E8D6A6;
+  --champagne-pale: #F3E8C9;
+  --antique: #A17B42;
+  --gold-ink: #7d5d29; /* gold that stays readable (≥ 5:1) on ivory */
+
+  /* Paper family */
+  --ivory: #F8F3E9;
+  --cream: #EFE5D5;
+  --parchment: #E2D3BA;
+
+  /* Text */
+  --ink: #3a0e1c;
+  --ink-soft: rgba(58, 14, 28, 0.74);
+  --on-dark: #F8F3E9;
+  --on-dark-soft: rgba(248, 243, 233, 0.76);
+
+  /* Foil — the only metallic gradient; reserved for names & monogram */
+  --foil: linear-gradient(104deg, #b58d46 0%, #e9d5a1 22%, #c6a15b 44%, #f4e7c3 62%, #b9924c 82%, #d9bd7e 100%);
+
+  /* Type */
+  --font-script: "Pinyon Script", "Snell Roundhand", cursive;
+  --font-serif: "Cormorant Garamond", "Cormorant", Georgia, serif;
+  --font-sans: "Jost", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Layout */
+  --gutter: clamp(20px, 6vw, 56px);
+  --section-y: clamp(84px, 13vw, 150px);
+  --edge-h: clamp(14px, 2.6vw, 26px);
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-html {
-  scroll-behavior: smooth;
+/* Arabic swaps the whole type system through the same variables */
+:lang(ar) {
+  --font-script: "Aref Ruqaa", "Amiri", serif;
+  --font-serif: "Amiri", "Noto Naskh Arabic", "Times New Roman", serif;
+  --font-sans: "Amiri", "Noto Naskh Arabic", system-ui, sans-serif;
 }
+/* Tracking breaks Arabic letter joining — never letter-space Arabic */
+:lang(ar) * { letter-spacing: 0 !important; text-transform: none !important; }
+html:lang(ar) { font-size: 106.25%; }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   BASE
+   ══════════════════════════════════════════════════════════════════════════ */
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; scroll-padding-top: 72px; }
 body {
-  font-family: Lato, sans-serif;
-  background-color: #F8F2E8;
-  color: #45101F;
-  overflow-x: hidden;
+  margin: 0;
+  background: var(--ivory);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-weight: 300;
+  line-height: 1.6;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-variant-numeric: lining-nums;
+}
+#root { min-height: 100svh; }
+::selection { background: var(--champagne); color: var(--wine-night); }
+
+:focus-visible { outline: 2px solid var(--champagne); outline-offset: 3px; border-radius: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
 }
 
-#root {
-  min-height: 100vh;
-}
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--wine-night); }
+::-webkit-scrollbar-thumb { background: var(--antique); border-radius: 4px; }
 
-/* ── Metallic gold shimmer text ─────────────────────────────────────────── */
-.gold-text {
-  background: linear-gradient(
-    135deg,
-    #a07c3a 0%, #C6A15B 20%, #E8D5A0 40%,
-    #C6A15B 50%, #a07c3a 65%, #E8D5A0 80%, #C6A15B 100%
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  background-size: 200% auto;
-  animation: goldShimmer 4s linear infinite;
-}
-
-.gold-text-static {
-  background: linear-gradient(
-    135deg,
-    #a07c3a 0%, #C6A15B 25%, #E8D5A0 45%, #C6A15B 55%, #a07c3a 75%, #C6A15B 100%
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* ── Velvet burgundy background ─────────────────────────────────────────── */
-.velvet-bg {
-  background:
-    radial-gradient(ellipse at 20% 20%, rgba(122,35,64,0.5) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 80%, rgba(69,16,31,0.5) 0%, transparent 60%),
-    linear-gradient(135deg, #641B30 0%, #45101F 50%, #641B30 100%);
+/* ══════════════════════════════════════════════════════════════════════════
+   SECTION SYSTEM
+   ══════════════════════════════════════════════════════════════════════════ */
+.section {
+  --bg: var(--ivory);
   position: relative;
+  isolation: isolate;
+  background: var(--bg);
+  padding: var(--section-y) var(--gutter);
 }
-.velvet-bg::before {
-  content: '';
+.section--ivory { --bg: var(--ivory); color: var(--ink); }
+.section--cream { --bg: var(--cream); color: var(--ink); }
+.section--wine { --bg: var(--wine); color: var(--on-dark); }
+.section--night { --bg: var(--wine-night); color: var(--on-dark); }
+.container { width: 100%; max-width: 1080px; margin-inline: auto; position: relative; z-index: 2; }
+
+/* Section transition: a skyline of pointed Moorish arches rising into the previous section */
+.arch-edge {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: var(--edge-h);
+  transform: translateY(calc(-100% + 1px));
+  background: var(--bg);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 22' preserveAspectRatio='none'%3E%3Cpath d='M0 22 C0 12 12 8 32 0 C52 8 64 12 64 22Z'/%3E%3C/svg%3E") repeat-x 0 100% / calc(var(--edge-h) * 2.9) 100%;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 22' preserveAspectRatio='none'%3E%3Cpath d='M0 22 C0 12 12 8 32 0 C52 8 64 12 64 22Z'/%3E%3C/svg%3E") repeat-x 0 100% / calc(var(--edge-h) * 2.9) 100%;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Quiet zellige lattice — drawn once as an SVG data-URI, tinted per context */
+.zellige::before {
+  content: "";
   position: absolute;
   inset: 0;
-  background-image: repeating-linear-gradient(
-    45deg, transparent, transparent 2px,
-    rgba(255,255,255,0.01) 2px, rgba(255,255,255,0.01) 4px
-  );
+  z-index: 0;
   pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='88' height='88' viewBox='0 0 88 88' fill='none' stroke='%23E8D6A6' stroke-width='.8'%3E%3Crect x='24' y='24' width='40' height='40'/%3E%3Cpath d='M44 11 77 44 44 77 11 44Z'/%3E%3Ccircle cx='44' cy='44' r='7'/%3E%3Cpath d='M0 0 11 11M88 0 77 11M0 88 11 77M88 88 77 77M0 44H11M77 44H88M44 0V11M44 77V88'/%3E%3C/svg%3E");
+  background-size: 88px 88px;
+  opacity: 0.07;
+}
+.section--ivory.zellige::before,
+.section--cream.zellige::before { filter: invert(1) sepia(1) hue-rotate(-12deg) saturate(2.4); opacity: 0.09; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   TYPE UTILITIES
+   ══════════════════════════════════════════════════════════════════════════ */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9em;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: clamp(0.66rem, 1.7vw, 0.76rem);
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--gold-ink);
+  margin: 0;
+}
+.eyebrow::before, .eyebrow::after { content: ""; width: 1.6em; height: 1px; background: currentColor; opacity: 0.55; }
+.section--wine .eyebrow, .section--night .eyebrow { color: var(--champagne); }
+
+.h2 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(2.2rem, 6vw, 3.9rem);
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  margin: 0.45em 0 0;
+  text-wrap: balance;
+}
+.section--ivory .h2, .section--cream .h2 { color: var(--wine); }
+.section--wine .h2, .section--night .h2 { color: var(--champagne-pale); }
+
+.section-head { text-align: center; margin-bottom: clamp(44px, 8vw, 84px); }
+
+.foil {
+  background: var(--foil);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+          background-clip: text;
+  -webkit-text-fill-color: transparent;
+          color: transparent;
 }
 
-/* ── Ivory paper texture ────────────────────────────────────────────────── */
-.ivory-paper {
-  background:
-    radial-gradient(ellipse at 30% 70%, rgba(198,161,91,0.06) 0%, transparent 50%),
-    radial-gradient(ellipse at 70% 30%, rgba(198,161,91,0.04) 0%, transparent 50%),
-    #F8F2E8;
+/* ══════════════════════════════════════════════════════════════════════════
+   BUTTONS
+   ══════════════════════════════════════════════════════════════════════════ */
+.btn {
+  --btn-fg: var(--wine-night);
+  --btn-bg: var(--champagne);
+  --btn-bd: var(--champagne);
+  --btn-hover-bg: var(--champagne-light);
+  --btn-hover-fg: var(--wine-night);
   position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85em;
+  padding: 1.05em 2.2em;
+  min-height: 48px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 0.74rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--btn-fg);
+  background: var(--btn-bg);
+  border: 1px solid var(--btn-bd);
+  border-radius: 2px;
+  cursor: pointer;
+  overflow: hidden;
+  isolation: isolate;
+  transition: color 0.5s var(--ease-out), border-color 0.5s var(--ease-out), transform 0.5s var(--ease-out), box-shadow 0.5s var(--ease-out);
+}
+.btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--btn-hover-bg);
+  transform: translateY(101%);
+  transition: transform 0.55s var(--ease-out);
+}
+.btn:hover, .btn:focus-visible { color: var(--btn-hover-fg); transform: translateY(-2px); box-shadow: 0 14px 30px -14px rgba(0, 0, 0, 0.45); }
+.btn:hover::before, .btn:focus-visible::before { transform: translateY(0); }
+.btn:active { transform: translateY(0); }
+.btn svg { flex: none; }
+
+.btn--outline-gold { --btn-bg: transparent; --btn-fg: var(--champagne-light); --btn-bd: rgba(198, 161, 91, 0.65); --btn-hover-bg: var(--champagne); --btn-hover-fg: var(--wine-night); }
+.btn--burgundy { --btn-bg: var(--burgundy); --btn-bd: var(--burgundy); --btn-fg: var(--ivory); --btn-hover-bg: var(--wine-night); --btn-hover-fg: var(--champagne-light); }
+.btn--outline { --btn-bg: transparent; --btn-fg: var(--wine); --btn-bd: rgba(74, 16, 36, 0.4); --btn-hover-bg: var(--wine); --btn-hover-fg: var(--ivory); }
+
+.link-quiet {
+  background: none; border: 0; padding: 0.4em 0; cursor: pointer;
+  font: inherit; font-size: 0.85rem; color: inherit; opacity: 0.7;
+  text-decoration: underline; text-underline-offset: 0.3em; text-decoration-thickness: 1px;
+  transition: opacity 0.3s;
+}
+.link-quiet:hover { opacity: 1; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ORNAMENT
+   ══════════════════════════════════════════════════════════════════════════ */
+.divider { display: flex; align-items: center; justify-content: center; gap: 1rem; color: var(--champagne); width: min(320px, 70vw); margin-inline: auto; }
+.divider__line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, currentColor 40%, currentColor 60%, transparent); opacity: 0.7; }
+.section--ivory .divider, .section--cream .divider { color: var(--antique); }
+
+@media (max-width: 520px) {
+  .btn { letter-spacing: 0.18em; padding-inline: 1.4em; }
+  .rsvp-form__submit { letter-spacing: 0.14em; }
 }
 
-/* ── Keyframe animations ────────────────────────────────────────────────── */
-@keyframes goldShimmer {
-  0%   { background-position: 0% center; }
-  100% { background-position: 200% center; }
-}
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-8px); }
-}
-@keyframes rotateSlow {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-@keyframes pulseGold {
-  0%, 100% { opacity: 1; filter: brightness(1); }
-  50%       { opacity: 0.85; filter: brightness(1.2); }
-}
-
-/* ── Utility animation classes ──────────────────────────────────────────── */
-.animate-float       { animation: float 6s ease-in-out infinite; }
-.animate-spin-slow   { animation: rotateSlow 20s linear infinite; }
-.animate-gold-shimmer { animation: goldShimmer 3s linear infinite; }
-
-/* ── Custom scrollbar ───────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #45101F; }
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(#C6A15B, #a07c3a);
-  border-radius: 3px;
-}
-
-/* ── Music player backdrop ──────────────────────────────────────────────── */
-.music-player {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
+/* Arabic (Amiri) is optically smaller than the Latin faces at the same size — compensate on small text */
+:lang(ar) .eyebrow, :lang(ar) .niche__label, :lang(ar) .unit__label, :lang(ar) .field label, :lang(ar) .field legend,
+:lang(ar) .footer__love, :lang(ar) .rsvp-ok__label, :lang(ar) .hero__cue, :lang(ar) .hero__side { font-size: 1.02rem; }
+:lang(ar) .btn, :lang(ar) .nav__cta, :lang(ar) .nav__links a { font-size: 1rem; font-weight: 700; }
+:lang(ar) .arch__tag { font-size: clamp(1.05rem, 4.6cqw, 1.5rem); }
+:lang(ar) .arch__date { font-size: clamp(0.9rem, 3.6cqw, 1.15rem); font-weight: 700; }
+:lang(ar) .env__kicker, :lang(ar) .env__date, :lang(ar) .countdown__date, :lang(ar) .footer__copy { font-size: 1.05rem; }
+:lang(ar) .field input[type="text"], :lang(ar) .field input[type="tel"], :lang(ar) .field select, :lang(ar) .field textarea { font-size: 1.35rem; }

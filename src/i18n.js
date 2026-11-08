@@ -2,19 +2,33 @@
 // Add all UI strings here. Keys are reused across components.
 // FR = French (default) · AR = Arabic (RTL)
 
+import { CONFIG } from './config'
+
+const names = `${CONFIG.bride} & ${CONFIG.groom}`
+
 export const translations = {
   fr: {
+    // Names (Latin script — straight from CONFIG so there is a single source of truth)
+    brideName: CONFIG.bride,
+    groomName: CONFIG.groom,
+    pageTitle: `${names} — 26.01.2027`,
+
     // EnvelopeOpening
     cordiallyInvited: 'Vous êtes cordialement invités',
     openInvitation: 'Ouvrir votre invitation',
     weddingDate: '26 · 01 · 2027',
 
-    // WeddingInvitation
+    // Hero + message
     invitationLabel: 'Invitation de Mariage',
     gettingMarried: 'We are getting married',
     dateDisplay: '26 JANVIER 2027',
+    scrollHint: 'Défiler',
     romanticMessage:
       "Le bonheur se partage et l'amour se célèbre. Nous serions honorés de vous compter parmi nous pour célébrer le début de notre nouvelle histoire.",
+
+    // Navigation
+    navDetails: 'Détails',
+    navLabel: 'Navigation principale',
 
     // WeddingDetails
     joinUs: 'Rejoignez-nous',
@@ -65,27 +79,50 @@ export const translations = {
     editAnswer: 'Modifier ma réponse',
     successPresent: 'Votre présence nous comblera de joie.',
     successAbsent: 'Nous sommes touchés par votre réponse.',
+    thanks: (first) => `Merci, ${first} !`,
+    copyMessage: 'Copier le message',
+    copied: 'Copié !',
+    sendTo: 'Envoyez à',
     rsvpWAText: (d) =>
-      `💌 *Confirmation — Mariage Kaoutar & Abdelsamad*\n\n👤 *Nom :* ${d.name}\n📞 *Tél :* ${d.phone}\n👥 *Personnes :* ${d.guests}\n${d.attending === 'yes' ? '✅ Oui, je serai présent(e)' : '❌ Je ne pourrai pas être présent(e)'}${d.message ? `\n\n💬 *Message :* ${d.message}` : ''}`,
+      `💌 *Confirmation — Mariage ${names}*\n\n👤 *Nom :* ${d.name}\n📞 *Tél :* ${d.phone}\n👥 *Personnes :* ${d.guests}\n${d.attending === 'yes' ? '✅ Oui, je serai présent(e)' : '❌ Je ne pourrai pas être présent(e)'}${d.message ? `\n\n💬 *Message :* ${d.message}` : ''}`,
+    rsvpEmailText: (d) =>
+      `Nom: ${d.name}\nTél: ${d.phone}\nPersonnes: ${d.guests}\nPrésence: ${d.attending === 'yes' ? 'Oui, présent(e)' : 'Non disponible'}${d.message ? `\nMessage: ${d.message}` : ''}`,
 
     // Footer
     closingMessage: 'Nous avons hâte de partager ce moment inoubliable avec vous.',
     withLove: 'Avec tout notre amour,',
-    copyright: '© 2027 Kaoutar & Abdelsamad',
+    copyright: `© 2027 ${names}`,
+
+    // Floating controls (accessibility labels)
+    musicPlay: 'Lancer la musique',
+    musicPause: 'Mettre la musique en pause',
+    volume: 'Volume',
+    switchLang: 'Passer en arabe',
+    switchLangShort: 'ع',
   },
 
   ar: {
+    // Names (Arabic script)
+    brideName: 'كوثر',
+    groomName: 'عبد الصمد',
+    pageTitle: 'كوثر وعبد الصمد — ٢٦.٠١.٢٠٢٧',
+
     // EnvelopeOpening
     cordiallyInvited: 'نحن نشرفكم بدعوتكم',
     openInvitation: 'افتح دعوتك',
     weddingDate: '٢٠٢٧ · ٠١ · ٢٦',
 
-    // WeddingInvitation
+    // Hero + message
     invitationLabel: 'دعوة زفاف',
     gettingMarried: 'نحن نتزوج',
     dateDisplay: '٢٦ يناير ٢٠٢٧',
+    scrollHint: 'مرّر للأسفل',
     romanticMessage:
       'السعادة تُشارَك والحب يُحتفَل به. سيكون من دواعي شرفنا أن نحظى بوجودكم معنا للاحتفال ببداية قصتنا الجديدة.',
+
+    // Navigation
+    navDetails: 'التفاصيل',
+    navLabel: 'التنقل الرئيسي',
 
     // WeddingDetails
     joinUs: 'انضموا إلينا',
@@ -136,13 +173,25 @@ export const translations = {
     editAnswer: 'تعديل إجابتي',
     successPresent: 'حضوركم سيملأ قلوبنا فرحاً.',
     successAbsent: 'نحن ممتنون لردكم.',
+    thanks: (first) => `شكراً، ${first}!`,
+    copyMessage: 'نسخ الرسالة',
+    copied: 'تم النسخ!',
+    sendTo: 'أرسلوا إلى',
     rsvpWAText: (d) =>
-      `💌 *تأكيد — زفاف كوثر وعبدالصمد*\n\n👤 *الاسم:* ${d.name}\n📞 *الهاتف:* ${d.phone}\n👥 *عدد الأشخاص:* ${d.guests}\n${d.attending === 'yes' ? '✅ نعم، سأكون حاضراً/ة' : '❌ لن أتمكن من الحضور'}${d.message ? `\n\n💬 *رسالة:* ${d.message}` : ''}`,
+      `💌 *تأكيد — زفاف كوثر وعبد الصمد*\n\n👤 *الاسم:* ${d.name}\n📞 *الهاتف:* ${d.phone}\n👥 *عدد الأشخاص:* ${d.guests}\n${d.attending === 'yes' ? '✅ نعم، سأكون حاضراً/ة' : '❌ لن أتمكن من الحضور'}${d.message ? `\n\n💬 *رسالة:* ${d.message}` : ''}`,
+    rsvpEmailText: (d) =>
+      `الاسم: ${d.name}\nالهاتف: ${d.phone}\nعدد الأشخاص: ${d.guests}\nالحضور: ${d.attending === 'yes' ? 'نعم، حاضر/ة' : 'غير متاح'}${d.message ? `\nرسالة: ${d.message}` : ''}`,
 
     // Footer
     closingMessage: 'نتطلع إلى مشاركة هذه اللحظة الرائعة معكم.',
     withLove: 'بكل محبتنا،',
-    copyright: '© ٢٠٢٧ كوثر وعبدالصمد',
+    copyright: '© ٢٠٢٧ كوثر وعبد الصمد',
+
+    // Floating controls (accessibility labels)
+    musicPlay: 'تشغيل الموسيقى',
+    musicPause: 'إيقاف الموسيقى مؤقتاً',
+    volume: 'مستوى الصوت',
+    switchLang: 'Passer en français',
+    switchLangShort: 'FR',
   },
 }
-
