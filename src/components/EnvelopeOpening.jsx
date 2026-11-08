@@ -61,8 +61,8 @@ function WaxSeal({ size, breaking, onClick }) {
           <linearGradient id="goldText" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="#8a6520"/>
             <stop offset="30%" stopColor="#C6A15B"/>
-            <stop offset="55%" stopColor="#E8D5A0"/>
-            <stop offset="80%" stopColor="#C6A15B"/>
+            <stop offset="55%" stopColor="#ebdcb4ff"/>
+            <stop offset="80%" stopColor="#b4a764ff"/>
             <stop offset="100%" stopColor="#8a6520"/>
           </linearGradient>
           <filter id="sealShadow">
@@ -86,11 +86,23 @@ function WaxSeal({ size, breaking, onClick }) {
           return <circle key={i} cx={65 + 42 * Math.cos(a)} cy={65 + 42 * Math.sin(a)}
             r="1.3" fill="rgba(255,255,255,0.1)"/>
         })}
-        {/* K & A text */}
-        <text x="65" y="75" textAnchor="middle"
-          fontFamily='"Great Vibes", cursive' fontSize="30" fill="url(#goldText)"
-          style={{ filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.6))' }}
-        >K &amp; A</text>
+  {/* K & A - Luxury Calligraphy */}
+<text
+  x="65"
+  y="77"
+  textAnchor="middle"
+  fontFamily='"Great Vibes", cursive'
+  fontSize="39"
+  fontWeight="450"
+  fontStyle="italic"
+  letterSpacing="1"
+  fill="url(#goldText)"
+  style={{
+    filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.6))',
+  }}
+>
+  K &amp; A
+</text>
       </svg>
 
       {/* Crack lines on break */}
@@ -229,13 +241,13 @@ export default function EnvelopeOpening({ onOpen }) {
             <div style={{
               position: 'absolute', top: 0, left: 0, bottom: 0, width: '50%',
               clipPath: 'polygon(0% 0%, 100% 50%, 0% 100%)',
-              background: 'linear-gradient(to right, #EAE0CA, #EDE5D2)',
+              background: 'linear-gradient(to right, #E8DEC8, #EDE5D2)',
             }}/>
             {/* ── Right flap ── */}
             <div style={{
               position: 'absolute', top: 0, right: 0, bottom: 0, width: '50%',
               clipPath: 'polygon(100% 0%, 0% 50%, 100% 100%)',
-              background: 'linear-gradient(to left, #E6DCC6, #EDE5D2)',
+              background: 'linear-gradient(to left, #E8DEC8, #EDE5D2)',
             }}/>
 
             {/* ── Top flap (opens upward) ── */}
@@ -243,7 +255,7 @@ export default function EnvelopeOpening({ onOpen }) {
               style={{
                 position: 'absolute', top: 0, left: 0, right: 0, height: '50%',
                 clipPath: 'polygon(0% 0%, 50% 100%, 100% 0%)',
-                background: 'linear-gradient(to bottom, #EDE5D2, #E8DEC8)',
+                background: 'linear-gradient(to bottom, #E8DEC8, #E8DEC8)',
                 transformOrigin: 'top center',
                 zIndex: 10,
               }}

@@ -67,28 +67,56 @@ export default function WeddingInvitation() {
           <FloralOrnament />
         </motion.div>
 
-        {/* Couple names */}
-        <motion.div variants={fadeUp(0.3)} initial="hidden" whileInView="visible" viewport={{ once: true }}
-          style={{ marginBottom: 'clamp(12px,2vw,20px)', width: '100%', overflow: 'hidden' }}>
-          <h1 style={{
-            fontFamily:'"Great Vibes", cursive',
-            /* Scale purely with viewport so it always stays on one line */
-            fontSize: 'min(8.5vw, 6.5rem)',
-            lineHeight: 1.15,
-            whiteSpace: 'nowrap',
-            display: 'block',
-            width: '100%',
-            textAlign: 'center',
-            /* Shrink text if still too wide (last resort) */
-            overflowX: 'hidden',
-            background:'linear-gradient(135deg, #a07c3a 0%, #C6A15B 25%, #E8D5A0 45%, #C6A15B 55%, #a07c3a 75%, #C6A15B 100%)',
-            WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text',
-            backgroundSize:'200% auto', animation:'goldShimmer 4s linear infinite',
-            filter:'drop-shadow(0 2px 8px rgba(198,161,91,0.25))',
-          }}>
-            {CONFIG.bride} &amp; {CONFIG.groom}
-          </h1>
-        </motion.div>
+        
+{/* Couple names */}
+<motion.div
+  variants={fadeUp(0.3)}
+  initial="hidden"
+  whileInView="visible"
+  viewport={{ once: true }}
+  style={{
+    marginBottom: 'clamp(12px, 2vw, 20px)',
+    width: '100%',
+    overflow: 'visible',
+    padding: '0 8px',
+  }}
+>
+  <h1
+    style={{
+      fontFamily: '"Great Vibes", cursive',
+      fontSize: 'clamp(2.5rem, 6vw, 5rem)',
+      lineHeight: 1.4,
+      whiteSpace: 'normal',
+      overflowWrap: 'normal',
+      textAlign: 'center',
+      width: '100%',
+      margin: 0,
+      padding: '0 0.12em',
+
+      background: 'linear-gradient(135deg, #a07c3a 0%, #C6A15B 25%, #E8D5A0 45%, #C6A15B 55%, #a07c3a 75%, #C6A15B 100%)',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+      backgroundClip: 'text',
+
+      filter: 'drop-shadow(0 2px 8px rgba(198,161,91,0.25))',
+    }}
+  >
+    {CONFIG.bride} &amp; {CONFIG.groom}
+  </h1>
+
+  {/* Elegant gold signature line */}
+  <div
+    style={{
+      width: 'clamp(90px, 14vw, 140px)',
+      height: '2px',
+      margin: '10px auto 0',
+      background: 'linear-gradient(90deg, transparent, #C6A15B, #E8D5A0, #C6A15B, transparent)',
+      boxShadow: '0 1px 5px rgba(198,161,91,0.35)',
+      borderRadius: '50%',
+    }}
+  />
+</motion.div>
+
 
         {/* Divider */}
         <motion.div variants={fadeUp(0.4)} initial="hidden" whileInView="visible" viewport={{ once: true }}
